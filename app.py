@@ -29,6 +29,24 @@ if os.environ.get('RENDER'):
 else:
     DATABASE_PATH = 'tutor.db'
 
+# Initialize database on app startup
+def initialize_app():
+    """Initialize the application"""
+    try:
+        print(f"Initializing app with database path: {DATABASE_PATH}")
+        init_db()
+        print("Database initialization completed successfully")
+        # Create upload directory if it doesn't exist
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        print("Upload folder created/verified")
+    except Exception as e:
+        print(f"Error during app initialization: {e}")
+        # Don't raise the error to prevent app from crashing
+        # Instead, let the emergency init route handle it
+
+# Call initialization when module is imported
+initialize_app()
+
 def init_db():
     """Initialize the SQLite database"""
     conn = sqlite3.connect(DATABASE_PATH)
@@ -414,6 +432,15 @@ def auth_status():
         })
     else:
         return jsonify({'authenticated': False})
+
+@app.route('/api/db/init', methods=['POST'])
+def init_database():
+    """Initialize database tables (emergency route)"""
+    try:
+        init_db()
+        return jsonify({'success': True, 'message': 'Database initialized successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/user/create', methods=['POST'])
 def create_user():
