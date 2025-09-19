@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Personal Tutor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><i class="fas fa-brain"></i> AI Personal Tutor</h1>
+            <p>Learn anything with text, voice, and visuals</p>
+        </header>
+
+        <!-- Main Interface -->
+        <div id="mainInterface">
+            <!-- User Info Bar -->
+            <div class="user-info-bar">
+                <div class="user-welcome">
+                    <span id="welcomeText">Welcome!</span>
+                </div>
+                <div class="user-actions">
+                    <button id="logoutBtn" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="lesson">
+                    <i class="fas fa-book"></i> Lesson
+                </button>
+                <button class="tab-btn" data-tab="chat">
+                    <i class="fas fa-comments"></i> Chat
+                </button>
+                <button class="tab-btn" data-tab="image">
+                    <i class="fas fa-image"></i> Images
+                </button>
+                <button class="tab-btn" data-tab="progress">
+                    <i class="fas fa-chart-line"></i> Progress
+                </button>
+                <button class="tab-btn" data-tab="quiz">
+                    <i class="fas fa-question-circle"></i> Quiz
+                </button>
+            </nav>
+
+            <!-- Lesson Tab -->
+            <div id="lessonTab" class="tab-content active">
+                <div class="lesson-creator">
+                    <h3>Create a New Lesson</h3>
+                    <div class="input-group">
+                        <input type="text" id="topicInput" placeholder="What would you like to learn about?" maxlength="100">
+                        <select id="difficultySelect">
+                            <option value="1">Beginner</option>
+                            <option value="2">Elementary</option>
+                            <option value="3">Intermediate</option>
+                            <option value="4">Advanced</option>
+                            <option value="5">Expert</option>
+                        </select>
+                        <button id="generateLessonBtn" class="btn-primary">
+                            <i class="fas fa-magic"></i> Generate Lesson
+                        </button>
+                    </div>
+                </div>
+
+                <div id="lessonContent" class="lesson-content hidden">
+                    <div class="lesson-controls">
+                        <button id="readAloudBtn" class="btn-secondary">
+                            <i class="fas fa-volume-up"></i> Read Aloud
+                        </button>
+                        <button id="stopReadingBtn" class="btn-secondary hidden">
+                            <i class="fas fa-stop"></i> Stop
+                        </button>
+                        <button id="pauseReadingBtn" class="btn-secondary hidden">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <div class="reading-speed">
+                            <label>Speed:</label>
+                            <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speedValue">1x</span>
+                        </div>
+                        <button id="generateDiagramBtn" class="btn-secondary">
+                            <i class="fas fa-chart-bar"></i> Generate Diagram
+                        </button>
+                        <select id="diagramType" class="form-control" style="width: auto; display: inline-block; margin-left: 10px;">
+                            <option value="flowchart">Flowchart</option>
+                            <option value="hierarchy">Hierarchy</option>
+                            <option value="process">Process</option>
+                        </select>
+                    </div>
+                    <div id="lessonText" class="lesson-text"></div>
+                    <div class="lesson-actions">
+                        <button id="markCompleteBtn" class="btn-success">
+                            <i class="fas fa-check"></i> Mark Complete
+                        </button>
+                        <button id="askQuestionBtn" class="btn-info">
+                            <i class="fas fa-question"></i> Ask Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div id="chatTab" class="tab-content">
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    <div class="chat-input-container">
+                        <div class="voice-controls">
+                            <button id="voiceInputBtn" class="btn-voice">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <span id="voiceStatus" class="voice-status"></span>
+                        </div>
+                        <input type="text" id="chatInput" placeholder="Ask a question or type your message..." maxlength="500">
+                        <button id="sendChatBtn" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Tab -->
+            <div id="imageTab" class="tab-content">
+                <div class="image-upload">
+                    <h3>Upload an Image for Analysis</h3>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & drop an image here or click to select</p>
+                        <input type="file" id="imageInput" accept="image/*" hidden>
+                        <button id="selectImageBtn" class="btn-secondary">Select Image</button>
+                    </div>
+                </div>
+
+                <div id="imagePreview" class="image-preview hidden">
+                    <h4>Image Preview</h4>
+                    <img id="previewImg" src="" alt="Preview">
+                    <button id="analyzeImageBtn" class="btn-primary">
+                        <i class="fas fa-search"></i> Analyze Image
+                    </button>
+                </div>
+
+                <div id="imageAnalysis" class="image-analysis hidden">
+                    <h4>AI Analysis</h4>
+                    <div id="analysisContent"></div>
+                </div>
+            </div>
+
+            <!-- Progress Tab -->
+            <div id="progressTab" class="tab-content">
+                <div class="progress-overview">
+                    <h3>Your Learning Progress</h3>
+                    <div id="progressStats" class="progress-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-book-open"></i>
+                            <h4>Lessons Completed</h4>
+                            <span id="lessonsCompleted">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <h4>Study Time</h4>
+                            <span id="totalStudyTime">0 min</span>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-star"></i>
+                            <h4>Average Score</h4>
+                            <span id="averageScore">-</span>
+                        </div>
+                    </div>
+                    <div id="progressHistory" class="progress-history"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Tab -->
+            <div id="quizTab" class="tab-content">
+                <div class="quiz-container">
+                    <div id="quizNotAvailable" class="quiz-not-available">
+                        <i class="fas fa-book-reader"></i>
+                        <h3>Complete a Lesson First!</h3>
+                        <p>Quizzes become available after you complete a lesson. Generate and finish a lesson to unlock the quiz feature.</p>
+                        <button class="btn-primary" onclick="switchTab('lesson')">
+                            <i class="fas fa-arrow-left"></i> Go to Lessons
+                        </button>
+                    </div>
+
+                    <div id="quizAvailable" class="quiz-available hidden">
+                        <div class="quiz-header">
+                            <h3>Quiz: <span id="quizTopic">Current Topic</span></h3>
+                            <div class="quiz-info">
+                                <span class="difficulty-badge" id="quizDifficulty">Level 1</span>
+                                <span class="question-counter">Question <span id="currentQuestion">1</span> of <span id="totalQuestions">5</span></span>
+                            </div>
+                        </div>
+
+                        <div id="quizQuestion" class="quiz-question">
+                            <h4 id="questionText">Loading question...</h4>
+                            <div id="questionOptions" class="question-options">
+                                <!-- Options will be populated by JavaScript -->
+                            </div>
+                            <div class="quiz-controls">
+                                <button id="submitAnswerBtn" class="btn-primary" disabled>
+                                    <i class="fas fa-check"></i> Submit Answer
+                                </button>
+                                <button id="nextQuestionBtn" class="btn-secondary hidden">
+                                    <i class="fas fa-arrow-right"></i> Next Question
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="quizResult" class="quiz-result hidden">
+                            <div class="result-header">
+                                <i class="fas fa-trophy"></i>
+                                <h3>Quiz Complete!</h3>
+                            </div>
+                            <div class="result-stats">
+                                <div class="result-item">
+                                    <span class="label">Score:</span>
+                                    <span class="value" id="finalScore">0/5</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="label">Percentage:</span>
+                                    <span class="value" id="finalPercentage">0%</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="label">Time Taken:</span>
+                                    <span class="value" id="quizTime">0 seconds</span>
+                                </div>
+                            </div>
+                            <div id="quizFeedback" class="quiz-feedback"></div>
+                            <div class="quiz-actions">
+                                <button id="retakeQuizBtn" class="btn-secondary">
+                                    <i class="fas fa-redo"></i> Retake Quiz
+                                </button>
+                                <button id="newLessonBtn" class="btn-primary" onclick="switchTab('lesson')">
+                                    <i class="fas fa-plus"></i> New Lesson
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay hidden">
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p id="loadingText">Processing...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
