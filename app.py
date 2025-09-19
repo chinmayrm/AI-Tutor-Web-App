@@ -12,7 +12,7 @@ import base64
 from ai_integration import ai_manager
 
 app = Flask(__name__)
-app.secret_key = secrets.token_hex(16)
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(16))
 CORS(app)
 
 # Configuration
@@ -21,9 +21,17 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# Production database path for Render
+if os.environ.get('RENDER'):
+    DATABASE_PATH = '/opt/render/project/src/data/tutor.db'
+    # Ensure data directory exists
+    os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+else:
+    DATABASE_PATH = 'tutor.db'
+
 def init_db():
     """Initialize the SQLite database"""
-    conn = sqlite3.connect('tutor.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
     # Check if users table exists and if it needs migration
@@ -149,7 +157,7 @@ def allowed_file(filename):
 
 def get_db_connection():
     """Get database connection"""
-    conn = sqlite3.connect('tutor.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 

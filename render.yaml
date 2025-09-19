@@ -1,28 +1,21 @@
-# Render.com deployment configuration
-
-# Build settings
-builds:
-  - name: ai-personal-tutor
+services:
+  - type: web
+    name: ai-tutor-web-app
+    env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    
-# Environment variables (set these in Render dashboard)
-environment:
-  - key: PYTHON_VERSION
-    value: 3.11.0
-  - key: PORT
-    value: 10000
-  
-# Optional AI service keys (add these in Render dashboard)
-# - key: GOOGLE_API_KEY
-#   value: your_google_api_key
-# - key: OPENAI_API_KEY  
-#   value: your_openai_api_key
-# - key: HUGGINGFACE_API_KEY
-#   value: your_huggingface_api_key
-
-# Health check
-healthCheckPath: /
-
-# Auto-deploy on push
-autoDeploy: true
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OPENROUTER_API_KEY
+        sync: false
+    healthCheckPath: /api/auth/status
+    autoDeploy: true
+    disk:
+      name: ai-tutor-disk
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
