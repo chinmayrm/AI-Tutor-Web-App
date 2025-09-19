@@ -44,9 +44,6 @@ def initialize_app():
         # Don't raise the error to prevent app from crashing
         # Instead, let the emergency init route handle it
 
-# Call initialization when module is imported
-initialize_app()
-
 def init_db():
     """Initialize the SQLite database"""
     conn = sqlite3.connect(DATABASE_PATH)
@@ -802,6 +799,9 @@ def generate_diagram():
     except Exception as e:
         print(f"Error generating diagram: {e}")
         return jsonify({'error': 'Failed to generate diagram'}), 500
+
+# Initialize the application when module is imported (for production)
+initialize_app()
 
 if __name__ == '__main__':
     # Initialize database
